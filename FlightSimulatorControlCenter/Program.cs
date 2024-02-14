@@ -16,13 +16,9 @@ namespace FlightSimulatorControlCenter
             ApplicationConfiguration.Initialize();
 
             // Sono singleton
-            IValidationUserInputService validationService = new ValidationUserInputService(); // servizio respondabile di Validare la form dell utente (normalmente sempre inserito) - viene passato come argomento alla nostra form sotto
+            IValidationUserInputService validationService = new ValidationUserInputService();
 
-            Application.Run(new MainWindow(validationService)); // viene lanciato il MAINWINDOW e lanciato un SERVICE
+            Application.Run(new MainWindow(validationService));
         }
-    
-   
-
-    
     }
 }

@@ -59,6 +59,7 @@
             fleetManagerToolStripMenuItem.Name = "fleetManagerToolStripMenuItem";
             fleetManagerToolStripMenuItem.Size = new Size(224, 26);
             fleetManagerToolStripMenuItem.Text = "Fleet Manager";
+            fleetManagerToolStripMenuItem.Click += fleetManagerToolStripMenuItem_Click;
             // 
             // toolStripMenuItem1
             // 
@@ -70,7 +71,7 @@
             // scelta1ToolStripMenuItem
             // 
             scelta1ToolStripMenuItem.Name = "scelta1ToolStripMenuItem";
-            scelta1ToolStripMenuItem.Size = new Size(224, 26);
+            scelta1ToolStripMenuItem.Size = new Size(151, 26);
             scelta1ToolStripMenuItem.Text = "Manager";
             scelta1ToolStripMenuItem.Click += airplaneManager_Click;
             // 

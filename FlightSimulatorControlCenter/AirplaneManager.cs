@@ -52,28 +52,28 @@ namespace FlightSimulatorControlCenter
             label5.Text = NomeFlotta;
         }
 
-        private void creaAereo_Click(object sender, EventArgs e) // funzione del Crea Aereo - click del pulsante "Aggiungi Aereo"
+        private void creaAereo_Click(object sender, EventArgs e)
         {
-            // Recupero campi dal form (sono in formato stringa)
-            var formCodice = this.textBox1.Text; // campi che il Servizio di Validazione legge - ogni volta che entriamo in uno dei metodi li eseguiamo a cascata
+            // Recupero campi form
+            var formCodice = this.textBox1.Text;
             var formColore = this.textBox2.Text;
             var formNumeroDiPosti = this.textBox3.Text;
 
             // Valido l'input
-            var esistoValidazione = _validationService.ValidateUserInputForAirplaneCreation(formCodice, formColore, formNumeroDiPosti); // chiamata al servizio di Validazione
+            var esistoValidazione = _validationService.ValidateUserInputForAirplaneCreation(formCodice, formColore, formNumeroDiPosti);
 
             if (esistoValidazione.IsValid())
             {
                 // X Ragazzi, perchè non mi faccio ritornare direttamente il modello dell'aereo dall'esito validazione
                 // Salvo in locale
-                var a1 = AereoBl.AereoBlCreateFactory(esistoValidazione.Codice, esistoValidazione.Colore, esistoValidazione.NumeroDiPosti); // qui l Aereo è BL - costruzione del Modello BL
-                aerei.Add(a1); 
+                var a1 = AereoBl.AereoBlCreateFactory(esistoValidazione.Codice, esistoValidazione.Colore, esistoValidazione.NumeroDiPosti);
+                aerei.Add(a1);
 
                 // Qui faro la mia chiamata in remoto
             }
             else {
                 var messaggeToshow = new StringBuilder();
-                messaggeToshow.Append("Prima di procedere correggere i seguenti errori:\n\r"); // stampa il messaggio con l'errore
+                messaggeToshow.Append("Prima di procedere correggere i seguenti errori:\n\r");
 
                 foreach (var message in esistoValidazione.ValidationErrors)
                 {
