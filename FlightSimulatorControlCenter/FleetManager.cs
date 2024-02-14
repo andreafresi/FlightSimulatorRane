@@ -15,6 +15,7 @@ namespace FlightSimulatorControlCenter
         public FleetManager()
         {
             InitializeComponent();
+            //tabellaFlotte.CurrentRow da l'indice in base alla tabella che hai passato per la linea selezionata con le parentesi quadre.
         }
 
         private void FleetManager_Load(object sender, EventArgs e)

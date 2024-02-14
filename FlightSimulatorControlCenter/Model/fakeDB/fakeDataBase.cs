@@ -1,37 +1,40 @@
-﻿using System;
+﻿using FlightSimulatorControlCenter.Model.Aereo;
+using FlightSimulatorControlCenter.Model.Flotta;
+using FlightSimulatorControlCenter.Model.FlottaAPI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FlightSimulatorControlCenter.Model.FakeDB
+namespace FlightSimulatorControlCenter.Model.fakeDB
 {
-    public static class FakeDatabase
+    public static class fakeDataBase
     {
-        public static List<Flotta> Flotte { get; set; }
+
+        public static List<FlottaAPI> Flotte { get; set; }
         public static long IdAereoKey { get; set; }
 
-        static FakeDatabase()
+        static fakeDataBase()
         {
-            var aereo1 = new AereoBl(1, "ABCDEF1", "Rosso", 120);
-            var aereo2 = new Aereo(2, "ABCDEF2", "Rosso", 120);
-            var aereo3 = new Aereo(3, "ABCDEF3", "Rosso", 120);
-            Flotta f1 = new Flotta(10000, [aereo1, aereo2, aereo3]);
+            var aereo1 = AereoBl.AereoBlCreateFactory("ABCDEF1", "Rosso", 120);
+            var aereo2 = AereoBl.AereoBlCreateFactory("ABCDEF1", "verde", 120);
+            var aereo3 = AereoBl.AereoBlCreateFactory("ABCDEF2", "blu", 120);
+            FlottaAPI f1 = new FlottaAPI(10000, [aereo1, aereo2, aereo3]);
 
-            var aereo4 = new Aereo(4, "ABCDEF4", "Rosso", 120);
-            var aereo5 = new Aereo(5, "ABCDEF5", "Rosso", 120);
-            var aereo6 = new Aereo(6, "ABCDEF6", "Rosso", 120);
-            Flotta f2 = new Flotta(10001, [aereo4, aereo5, aereo6]);
+            var aereo4 = AereoBl.AereoBlCreateFactory("ABCDEF4", "Rosso", 120);
+            var aereo5 = AereoBl.AereoBlCreateFactory("ABCDEF5", "Rosso", 120);
+            var aereo6 = AereoBl.AereoBlCreateFactory("ABCDEF6", "Rosso", 120);
+            FlottaAPI f2 = new FlottaAPI(10001, [aereo4, aereo5, aereo6]);
 
-            var aereo7 = new Aereo(7, "ABCDEF7", "Rosso", 120);
-            var aereo8 = new Aereo(8, "ABCDEF8", "Rosso", 120);
-            Flotta f3 = new Flotta(10002, [aereo7, aereo8]);
+            var aereo7 = AereoBl.AereoBlCreateFactory("ABCDEF7", "Rosso", 120);
+            var aereo8 = AereoBl.AereoBlCreateFactory("ABCDEF8", "Rosso", 120);
+            FlottaAPI f3 = new FlottaAPI(10002, [aereo7, aereo8]);
 
-            Flotte = new List<Flotta>() { f1, f2, f3 };
+            Flotte = new List<FlottaAPI>() { f1, f2, f3 };
 
-            IdAereoKey = 10;
+            IdAereoKey++;
         }
-
 
     }
 }
