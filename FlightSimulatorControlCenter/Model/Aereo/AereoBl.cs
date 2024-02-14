@@ -12,7 +12,7 @@
         {
         }
 
-        protected AereoBl(long idAereo, string codice, string colore, long numeroDiPosti) // protected
+        protected AereoBl(long idAereo, string codice, string colore, long numeroDiPosti)
         {
             this.IdAereo = idAereo;
             this.Codice = codice;

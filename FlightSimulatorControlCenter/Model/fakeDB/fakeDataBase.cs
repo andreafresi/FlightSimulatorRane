@@ -1,6 +1,5 @@
 ﻿using FlightSimulatorControlCenter.Model.Aereo;
 using FlightSimulatorControlCenter.Model.Flotta;
-using FlightSimulatorControlCenter.Model.FlottaAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
