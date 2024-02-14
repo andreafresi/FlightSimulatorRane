@@ -19,7 +19,7 @@
             this.Colore = colore;
             this.NumeroDiPosti = numeroDiPosti;
         }
-
+        ///ertyuiopòà
         public static AereoBl AereoBlFactory(long idAereo, string codice, string colore, long numeroDiPosti)
         {
             return new AereoBl(idAereo, codice, colore, numeroDiPosti);
