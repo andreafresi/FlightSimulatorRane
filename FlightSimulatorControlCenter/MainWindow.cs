@@ -44,6 +44,11 @@ namespace FlightSimulatorControlCenter
 
         private void fleetManagerToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (!FormUtils.FormIsOpen("FleetManager"))
+            {
+                var fleetm = new FleetManager();
+                fleetm.Show();
+            }
 
         }
     }
