@@ -25,7 +25,7 @@ namespace FlightSimulatorControlCenter
 
         private void Step1Init_Load(object sender, EventArgs e)
         {
-            // Def data source
+           /* // Def data source
             aerei = new BindingList<AereoBl>();
             var source = new BindingSource(aerei, null);
 
@@ -49,7 +49,7 @@ namespace FlightSimulatorControlCenter
             tabellaAerei.Columns[3].HeaderText = "Num. Posti";
             tabellaAerei.Columns[3].Name = "NumeroDiPosti";
 
-            label5.Text = NomeFlotta;
+            label5.Text = NomeFlotta; */
         }
 
         private void creaAereo_Click(object sender, EventArgs e)
