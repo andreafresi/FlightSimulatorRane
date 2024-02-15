@@ -24,3 +24,8 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
+
+    # Controlla se la build è stata eseguita con successo
+    - name: Controlla lo stato della build
+      if: ${{ failure() }}
+      run: exit 1 
