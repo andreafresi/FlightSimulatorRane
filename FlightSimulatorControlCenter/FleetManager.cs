@@ -1,4 +1,6 @@
-﻿using FlightSimulatorControlCenter.Model.DB;
+﻿using ClientFlightSimula;
+using FlightSimulatorControlCenter.Model.Aereo;
+using FlightSimulatorControlCenter.Model.DB;
 using FlightSimulatorControlCenter.Model.Event;
 using FlightSimulatorControlCenter.Model.Flotta;
 using FlightSimulatorControlCenter.Service.Int;
@@ -15,6 +17,7 @@ namespace FlightSimulatorControlCenter
 
         private IValidationUserInputService _validationService;
         private BindingList<FlottaTableModel> flotte = new BindingList<FlottaTableModel>();
+        public List<FlottaApi> ListaFlotte { get; set; }
 
         public MainWindow FormPrincipale { get; set; }
 
@@ -23,7 +26,7 @@ namespace FlightSimulatorControlCenter
             InitializeComponent();
             _validationService = validationService;
 
-            InitalizeAereiDataGridFromDBModel();
+            AggiornaDataGridView();
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -31,27 +34,44 @@ namespace FlightSimulatorControlCenter
             // Aggiorno la flotta selezionata sul db
             int row = tabellaFlotte.CurrentRow.Index;
             var flottaTableSelezionata = flotte[row];
+            var fleetApi = ListaFlotte.Single(x => x.IdFlotta == flottaTableSelezionata.Id);
 
-            var flottaBlSelezionata = FakeDB.GetFlottaSelezionataById(flottaTableSelezionata.Id);
-            FakeDB.ImpostaFlottaSelezionata(flottaBlSelezionata);
+            var flottaBlSelezionata = FlottaBl.FlottaBlFactory(fleetApi.IdFlotta, fleetApi.Nome, "Attivo", new List<AereoBl>());
 
             // Mando l'evento
             this.FleetSelected(flottaBlSelezionata);
         }
 
-        public void RequestUpdateData() {
+        public void RequestUpdateData()
+        {
             InitalizeAereiDataGridFromDBModel();
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            InitalizeAereiDataGridFromDBModel();
+            AggiornaDataGridView();
         }
 
-        private void InitalizeAereiDataGridFromDBModel() {
+        private List<FlottaApi> CreazioneListaFlotte()
+        {
+
+            var client = new HttpClient();
+            client.BaseAddress = new Uri("http://localhost:5093/");
+            Client clientImpianto = new(client);
+            var t = clientImpianto.GetElencoFlotteAsync();
+            t.Wait();
+
+            var a = t.Result;
+
+
+            return a.ToList();
+        }
+
+        private void InitalizeAereiDataGridFromDBModel()
+        {
             flotte = new BindingList<FlottaTableModel>();
 
-            foreach (var f in FakeDB.Flotte)
+            foreach (var f in ListaFlotte)
             {
                 var temp = FlottaTableModel.FlottaTableModelFactory(f.IdFlotta, f.Nome, f.Aerei.Count, "Attiva");
                 flotte.Add(temp);
@@ -65,6 +85,30 @@ namespace FlightSimulatorControlCenter
             // Fit colonne a size tabella
             tabellaFlotte.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             tabellaFlotte.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string nameFlotta = textboxnameflotte.Text;
+            var request = new CreateFlottaRequest();
+            request.Nome = nameFlotta;
+
+
+            var client = new HttpClient();
+            client.BaseAddress = new Uri("http://localhost:5093/");
+            Client clientImpianto = new(client);
+            var t = clientImpianto.FlottaPOSTAsync(request);
+            t.Wait();
+
+            var a = t.Result;
+
+            AggiornaDataGridView();
+        }
+
+        private void AggiornaDataGridView()
+        {
+            ListaFlotte = CreazioneListaFlotte();
+            InitalizeAereiDataGridFromDBModel();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FlightSimulatorControlCenter.Helper;
 using FlightSimulatorControlCenter.Model.Aereo;
+using FlightSimulatorControlCenter.Model.Event;
 using FlightSimulatorControlCenter.Model.Flotta;
 using FlightSimulatorControlCenter.Service.Int;
 
@@ -82,14 +83,14 @@ namespace FlightSimulatorControlCenter
             {
                 // Ricevo la notifica che una flotta è stata modificata
                 // Chiedo alla form di gestione Aerei di aggiornare le info della flotta
-                airplaneManagerForm?.RequestUpdateData();
+                airplaneManagerForm?.RequestUpdateData(flotta.IdFlotta);
             };
 
             fleetManager.FleetSelected += (FlottaBl flotta) =>
             {
                 // Ricevo la notifica che una flotta è stata selezionata
                 // Chiedo alla form di gestione Aerei di aggiornare gli aerei
-                airplaneManagerForm?.RequestUpdateData();
+                airplaneManagerForm?.RequestUpdateData(flotta.IdFlotta);
                 UpdateLabelOfSelectedFleet(flotta.Nome);
             };
         }
