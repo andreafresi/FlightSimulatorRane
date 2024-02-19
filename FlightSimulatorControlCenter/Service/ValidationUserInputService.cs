@@ -1,33 +1,23 @@
 ﻿using FlightSimulatorControlCenter.Model.Validation;
 using FlightSimulatorControlCenter.Service.Int;
-using System.Text.RegularExpressions;
 
 namespace FlightSimulatorControlCenter.Service
 {
     public class ValidationUserInputService : IValidationUserInputService
     {
-        enum enumcolore { ROSSO, VERDE, BLU }
         public ValidationForUserAirplaneCreationResponse ValidateUserInputForAirplaneCreation(string codice, string colore, string numeroDiPosti)
         {
             var errorResult = new List<string>();
 
-            var formCodice = Regex.Replace(codice, @"[^a-zA-Z]", "");
-
+            var formCodice = codice;
             // X Ragazzi aggiungere controllo sul formato del codice per flotta
-            if (string.IsNullOrWhiteSpace(formCodice)) //check try parse?
-            {
+            if (string.IsNullOrWhiteSpace(codice)) {
                 errorResult.Add("Valorizzare il campo codice");
             }
 
-            var formColore = Regex.Replace(colore, @"[^a-zA-Z0-9]", "");
-
-            if (string.IsNullOrWhiteSpace(formColore) || !Enum.IsDefined(typeof(enumcolore), colore.ToUpper()))
-            {
-                errorResult.Add("Valorizzare il campo colore");
-            }
-
+            var formColore = colore;
             // X Ragazzi aggiungere controlli sui colori
-            if (string.IsNullOrWhiteSpace(formColore)) //enum
+            if (string.IsNullOrWhiteSpace(colore))
             {
                 errorResult.Add("Valorizzare il campo colore");
             }

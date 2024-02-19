@@ -1,70 +1,70 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using FlightSimulatorControlCenter.Model.Aereo;
-using FlightSimulatorControlCenter.Model.fakeDB;
+﻿using FlightSimulatorControlCenter.Model.DB;
+using FlightSimulatorControlCenter.Model.Event;
 using FlightSimulatorControlCenter.Model.Flotta;
+using FlightSimulatorControlCenter.Service.Int;
+using System.ComponentModel;
 
 namespace FlightSimulatorControlCenter
 {
     public partial class FleetManager : Form
     {
-        private BindingList<Flottabl> flotta;
+        // Eventi esposti dalla Form
+        public event FleetSelectedEvent FleetSelected;
+        public event FleetUpdatedEvent FleetUpdated;
+        public event FleetCreatedEvent FleetCreated;
 
+        private IValidationUserInputService _validationService;
+        private BindingList<FlottaTableModel> flotte = new BindingList<FlottaTableModel>();
 
-        public FleetManager()
+        public MainWindow FormPrincipale { get; set; }
+
+        public FleetManager(IValidationUserInputService validationService)
         {
             InitializeComponent();
-            //tabellaFlotte.CurrentRow da l'indice in base alla tabella che hai passato per la linea selezionata con le parentesi quadre.
-        }
+            _validationService = validationService;
 
-        private void FleetManager_Load(object sender, EventArgs e)
-        {
-            flotta = new BindingList<Flottabl>();
-            var source = new BindingSource(flotta, null);
-            
-            tabellaFlotte.DataSource = source;
-
-            tabellaFlotte.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            tabellaFlotte.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
-
-            // Cambio label tabella
-            tabellaFlotte.Columns[0].HeaderText = "Nome Flotta";
-            tabellaFlotte.Columns[0].Name = "NomeFlotta";
-
-            tabellaFlotte.Columns[1].HeaderText = "Numeri Aerei";
-            tabellaFlotte.Columns[1].Name = "numeriAerei";
-
-            tabellaFlotte.Columns[2].HeaderText = "stato";
-            tabellaFlotte.Columns[2].Name = "stato";
-
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
+            InitalizeAereiDataGridFromDBModel();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
+            // Aggiorno la flotta selezionata sul db
+            int row = tabellaFlotte.CurrentRow.Index;
+            var flottaTableSelezionata = flotte[row];
 
+            var flottaBlSelezionata = FakeDB.GetFlottaSelezionataById(flottaTableSelezionata.Id);
+            FakeDB.ImpostaFlottaSelezionata(flottaBlSelezionata);
+
+            // Mando l'evento
+            this.FleetSelected(flottaBlSelezionata);
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-
+        public void RequestUpdateData() {
+            InitalizeAereiDataGridFromDBModel();
         }
 
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void button3_Click(object sender, EventArgs e)
         {
+            InitalizeAereiDataGridFromDBModel();
+        }
 
+        private void InitalizeAereiDataGridFromDBModel() {
+            flotte = new BindingList<FlottaTableModel>();
+
+            foreach (var f in FakeDB.Flotte)
+            {
+                var temp = FlottaTableModel.FlottaTableModelFactory(f.IdFlotta, f.Nome, f.Aerei.Count, "Attiva");
+                flotte.Add(temp);
+            }
+
+            var source = new BindingSource(flotte, null);
+
+            // Binding data source
+            tabellaFlotte.DataSource = source;
+
+            // Fit colonne a size tabella
+            tabellaFlotte.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            tabellaFlotte.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
         }
     }
 }

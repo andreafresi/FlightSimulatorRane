@@ -28,87 +28,72 @@
         /// </summary>
         private void InitializeComponent()
         {
-            bottoneAggiungi = new Button();
-            bottoneSeleziona = new Button();
-            label1 = new Label();
             tabellaFlotte = new DataGridView();
-            label2 = new Label();
+            button1 = new Button();
+            button2 = new Button();
+            button3 = new Button();
             ((System.ComponentModel.ISupportInitialize)tabellaFlotte).BeginInit();
             SuspendLayout();
             // 
-            // bottoneAggiungi
-            // 
-            bottoneAggiungi.Location = new Point(587, 71);
-            bottoneAggiungi.Name = "Aggiungi Flotta";
-            bottoneAggiungi.Size = new Size(201, 29);
-            bottoneAggiungi.TabIndex = 0;
-            bottoneAggiungi.Text = "Aggiungi Flotta";
-            bottoneAggiungi.UseVisualStyleBackColor = true;
-            bottoneAggiungi.Click += button1_Click;
-            // 
-            // bottoneSeleziona
-            // 
-            bottoneSeleziona.Location = new Point(587, 36);
-            bottoneSeleziona.Name = "Seleziona Flotta";
-            bottoneSeleziona.Size = new Size(201, 29);
-            bottoneSeleziona.TabIndex = 1;
-            bottoneSeleziona.Text = "Seleziona Flotta";
-            bottoneSeleziona.UseVisualStyleBackColor = true;
-            bottoneSeleziona.Click += button2_Click;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.FlatStyle = FlatStyle.Flat;
-            label1.Location = new Point(12, 40);
-            label1.Name = "label1";
-            label1.Size = new Size(108, 20);
-            label1.TabIndex = 2;
-            label1.Text = "Flotta Corrente";
-            label1.Click += label1_Click;
-            // 
             // tabellaFlotte
             // 
+            tabellaFlotte.AllowUserToAddRows = false;
+            tabellaFlotte.AllowUserToDeleteRows = false;
             tabellaFlotte.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            tabellaFlotte.Location = new Point(12, 106);
+            tabellaFlotte.Location = new Point(12, 170);
             tabellaFlotte.Name = "tabellaFlotte";
-            tabellaFlotte.RowHeadersWidth = 51;
-            tabellaFlotte.Size = new Size(776, 332);
-            tabellaFlotte.TabIndex = 3;
-            tabellaFlotte.CellContentClick += dataGridView1_CellContentClick;
+            tabellaFlotte.Size = new Size(776, 268);
+            tabellaFlotte.TabIndex = 0;
             // 
-            // label2
+            // button1
             // 
-            label2.AutoSize = true;
-            label2.Location = new Point(126, 40);
-            label2.Name = "label2";
-            label2.Size = new Size(0, 20);
-            label2.TabIndex = 4;
+            button1.Location = new Point(654, 12);
+            button1.Name = "button1";
+            button1.Size = new Size(134, 43);
+            button1.TabIndex = 1;
+            button1.Text = "Aggiungi";
+            button1.UseVisualStyleBackColor = true;
+            // 
+            // button2
+            // 
+            button2.Location = new Point(654, 61);
+            button2.Name = "button2";
+            button2.Size = new Size(134, 42);
+            button2.TabIndex = 2;
+            button2.Text = "Seleziona";
+            button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
+            // 
+            // button3
+            // 
+            button3.Location = new Point(654, 109);
+            button3.Name = "button3";
+            button3.Size = new Size(132, 42);
+            button3.TabIndex = 3;
+            button3.Text = "Aggiorna";
+            button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click;
             // 
             // FleetManager
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
-            Controls.Add(label2);
+            Controls.Add(button3);
+            Controls.Add(button2);
+            Controls.Add(button1);
             Controls.Add(tabellaFlotte);
-            Controls.Add(label1);
-            Controls.Add(bottoneSeleziona);
-            Controls.Add(bottoneAggiungi);
             Name = "FleetManager";
             Text = "FleetManager";
-            Load += FleetManager_Load;
             ((System.ComponentModel.ISupportInitialize)tabellaFlotte).EndInit();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
 
-        private Button bottoneAggiungi;
-        private Button bottoneSeleziona;
-        private Label label1;
         private DataGridView tabellaFlotte;
-        private Label label2;
+        private Button button1;
+        private Button button2;
+        private Button button3;
     }
 }

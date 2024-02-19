@@ -1,25 +1,27 @@
 ﻿using FlightSimulatorControlCenter.Model.Aereo;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FlightSimulatorControlCenter.Model.Flotta
 {
-    internal class Flottabl :FlottaAPI
+    public class FlottaBl
     {
-      
+        public long IdFlotta { get; set; }
+        public string Nome { get; set; }
+        public string Stato { get; set; }
+        public List<AereoBl> Aerei { get; set; }
 
-        protected string nomeFlotta {  get; set; }
-        protected int numeriAerei { get; set; }
-        protected string stato { get; set; }
+        public FlottaBl(long idFlotta, string nome, string stato, List<AereoBl> aerei) {
+            IdFlotta = idFlotta;
+            Nome = nome;
+            Stato = stato;
+            Aerei = aerei;
+        }
 
-        public Flottabl(long idFlotta, List<AereoBl> aerei, string nomeFlotta, int numeriAerei, string stato) : base(idFlotta,aerei) 
-        {
-            this.nomeFlotta = nomeFlotta;
-            this.numeriAerei = numeriAerei;
-            this.stato = stato; 
+        public static FlottaBl FlottaBlFactory(long idFlotta, string nome, string stato, List<AereoBl> aerei) {
+            return new FlottaBl(idFlotta, nome, stato, aerei);
+        }
+
+        public void AddAereo(AereoBl aereobl) {
+            this.Aerei.Add(aereobl);
         }
     }
 }

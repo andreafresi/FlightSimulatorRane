@@ -38,12 +38,10 @@
             // 
             // menuStrip1
             // 
-            menuStrip1.ImageScalingSize = new Size(20, 20);
             menuStrip1.Items.AddRange(new ToolStripItem[] { fleetToolStripMenuItem, toolStripMenuItem1 });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Padding = new Padding(7, 3, 0, 3);
-            menuStrip1.Size = new Size(1138, 30);
+            menuStrip1.Size = new Size(996, 24);
             menuStrip1.TabIndex = 1;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -51,13 +49,13 @@
             // 
             fleetToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { fleetManagerToolStripMenuItem });
             fleetToolStripMenuItem.Name = "fleetToolStripMenuItem";
-            fleetToolStripMenuItem.Size = new Size(55, 24);
+            fleetToolStripMenuItem.Size = new Size(44, 20);
             fleetToolStripMenuItem.Text = "Fleet";
             // 
             // fleetManagerToolStripMenuItem
             // 
             fleetManagerToolStripMenuItem.Name = "fleetManagerToolStripMenuItem";
-            fleetManagerToolStripMenuItem.Size = new Size(224, 26);
+            fleetManagerToolStripMenuItem.Size = new Size(180, 22);
             fleetManagerToolStripMenuItem.Text = "Fleet Manager";
             fleetManagerToolStripMenuItem.Click += fleetManagerToolStripMenuItem_Click;
             // 
@@ -65,24 +63,23 @@
             // 
             toolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { scelta1ToolStripMenuItem });
             toolStripMenuItem1.Name = "toolStripMenuItem1";
-            toolStripMenuItem1.Size = new Size(79, 24);
+            toolStripMenuItem1.Size = new Size(63, 20);
             toolStripMenuItem1.Text = "Airplane";
             // 
             // scelta1ToolStripMenuItem
             // 
             scelta1ToolStripMenuItem.Name = "scelta1ToolStripMenuItem";
-            scelta1ToolStripMenuItem.Size = new Size(151, 26);
+            scelta1ToolStripMenuItem.Size = new Size(121, 22);
             scelta1ToolStripMenuItem.Text = "Manager";
             scelta1ToolStripMenuItem.Click += airplaneManager_Click;
             // 
             // MainWindow
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1138, 696);
+            ClientSize = new Size(996, 522);
             Controls.Add(menuStrip1);
             IsMdiContainer = true;
-            Margin = new Padding(3, 4, 3, 4);
             Name = "MainWindow";
             Text = "Flight Simulator Contro Center";
             menuStrip1.ResumeLayout(false);
