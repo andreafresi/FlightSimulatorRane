@@ -21,12 +21,15 @@ namespace FlightSimulatorControlCenter
         private IExternalServicesService _externalService;
         private IConversionModelService _conversionService;
 
+        private BindingList<AereoBl> result = new BindingList<AereoBl>();
+
         //Stato inizializzazione mancante
         private long idFlottaAttiva = -1;
         private FlottaBl flottaAttiva;
 
         private CreazioneAereo creazioneAereoForm;
         private ModificaAereo modificaAereoForm;
+        private CancellaManager cancellaManager;
 
         public AirplaneManager(long idFLottaAttiva, IValidationUserInputService validationService, IExternalServicesService externalService, IConversionModelService conversionService)
         {
@@ -183,7 +186,7 @@ namespace FlightSimulatorControlCenter
 
         private void InitalizeAereiDataGridFromDBModel()
         {
-            var result = new BindingList<AereoBl>();
+             result = new BindingList<AereoBl>();
 
             foreach (var a in flottaAttiva.Aerei)
             {
@@ -216,6 +219,15 @@ namespace FlightSimulatorControlCenter
         private void UpdateLabelOfSelectedFleet()
         {
             label5.Text = flottaAttiva.Nome;
-        }       
+        }
+
+        private void cancellaAereo_Click(object sender, EventArgs e)
+        {
+            int row = tabellaAerei.CurrentRow.Index;
+            var aereiTableSelezionata = result[row];
+
+            cancellaManager = new CancellaManager(aereiTableSelezionata);
+            cancellaManager.Show();
+        }
     }
 }
