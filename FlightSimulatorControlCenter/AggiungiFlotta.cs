@@ -31,5 +31,10 @@ namespace FlightSimulatorControlCenter
         {
             this.Close();
         }
+
+        private void AggiungiFlotta_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

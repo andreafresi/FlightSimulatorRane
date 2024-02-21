@@ -53,5 +53,10 @@ namespace FlightSimulatorControlCenter
             // Chiudo la form
             this.Close();
         }
+
+        private void CreazioneAereo_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
