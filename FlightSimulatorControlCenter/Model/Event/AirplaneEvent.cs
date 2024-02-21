@@ -9,5 +9,4 @@ namespace FlightSimulatorControlCenter.Model.Event
     public delegate void AirplaneExecuteCreateEvent(string codice, string colore, long numerodiposti);
     public delegate void AirplaneExecuteModifyEvent(long idFlotta, long idAereo, string codice, string colore, long numerodiposti);
     public delegate void AirplaneExecuteDeleteEvent(long idFlotta, long idAereo);
-
 }

@@ -128,7 +128,7 @@ namespace FlightSimulatorControlCenter
                 var flottaTableSelezionata = flottaAttiva.Aerei[row];
 
                 cancellaAereoForm = new CancellaAereo(idFlottaAttiva, flottaTableSelezionata);
-                cancellaAereoForm.AirplaneDeleteReq += (long idFlotta, long idAereo) =>
+                cancellaAereoForm.AirplaneDeleteReq += ( idFlotta, long idAereo) =>
                 {
                     // Eseguo la chiamata
                     var aereoApi = _externalService.AereoDeleteAsync(idAereo);
