@@ -1,5 +1,6 @@
 ﻿using Clients.ImpiantiClient;
 using FlightSimulatorControlCenter.Helper;
+using FlightSimulatorControlCenter.Model.Aereo;
 using FlightSimulatorControlCenter.Model.Event;
 using FlightSimulatorControlCenter.Model.Flotta;
 using FlightSimulatorControlCenter.Service.Int;
@@ -14,12 +15,14 @@ namespace FlightSimulatorControlCenter
         public event FleetUpdatedEvent FleetUpdated;
         public event FleetCreatedEvent FleetCreated;
 
+        // public event UpdateService UpdateServiceSelect;
+
         private AggiungiFlotta formCreazioneFlotta;
 
         private List<FlottaBl> _elencoFlotte = new List<FlottaBl>();
 
         private IValidationUserInputService _validationService;
-        private IExternalServicesService _externalService;
+        private IExternalServicesService _externalService; //
         private IConversionModelService _conversionService;
 
         private BindingList<FlottaTableModel> flotte = new BindingList<FlottaTableModel>();
@@ -34,6 +37,13 @@ namespace FlightSimulatorControlCenter
             _conversionService = conversionService;
 
             RetrieveAndUpdateFleetData();
+        }
+
+        // Metodo che gestisce cosa gli passa il Main
+        public void UpdateService(IExternalServicesService externalService)
+        {
+            _externalService = externalService;
+            RetrieveAndUpdateFleetData(); // aggiorna le flotte
         }
 
         private void button1_Click(object sender, EventArgs e)
