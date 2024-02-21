@@ -1,6 +1,5 @@
-﻿using ClientFlightSimula;
-using FlightSimulatorControlCenter.Model.Aereo;
-using FlightSimulatorControlCenter.Model.DB;
+﻿using Clients.ImpiantiClient;
+using FlightSimulatorControlCenter.Helper;
 using FlightSimulatorControlCenter.Model.Event;
 using FlightSimulatorControlCenter.Model.Flotta;
 using FlightSimulatorControlCenter.Service.Int;
@@ -15,63 +14,99 @@ namespace FlightSimulatorControlCenter
         public event FleetUpdatedEvent FleetUpdated;
         public event FleetCreatedEvent FleetCreated;
 
+        private AggiungiFlotta formCreazioneFlotta;
+
+        private List<FlottaBl> _elencoFlotte = new List<FlottaBl>();
+
         private IValidationUserInputService _validationService;
+        private IExternalServicesService _externalService;
+        private IConversionModelService _conversionService;
+
         private BindingList<FlottaTableModel> flotte = new BindingList<FlottaTableModel>();
-        public List<FlottaApi> ListaFlotte { get; set; }
 
         public MainWindow FormPrincipale { get; set; }
 
-        public FleetManager(IValidationUserInputService validationService)
+        public FleetManager(IValidationUserInputService validationService, IExternalServicesService externalService, IConversionModelService conversionService)
         {
             InitializeComponent();
             _validationService = validationService;
+            _externalService = externalService;
+            _conversionService = conversionService;
 
-            AggiornaDataGridView();
+            RetrieveAndUpdateFleetData();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            // Apro la form di creazione
+            if (!FormUtils.FormIsOpen("AggiungiFlotta"))
+            {
+                formCreazioneFlotta = new AggiungiFlotta(_validationService);
+                formCreazioneFlotta.FleetCreateReq += (string nomeFlotta) => {
+                    // Creo la request
+                    var req = new CreateFlottaRequest();
+                    req.Nome = nomeFlotta;
+
+                    // Eseguo la chiamata
+                    var flottaApi = _externalService.FlottaPOSTAsync(req);
+
+                    // converto il modello 
+                    var flottaBlCreata = _conversionService.ConvertToBl(flottaApi);
+
+                    // Mando l'evento
+                    this.FleetSelected(flottaBlCreata);
+
+                    // Chiudo la form
+                    formCreazioneFlotta.Close();
+
+                    // Richiedo l'aggiornamento della tabella
+                    RetrieveAndUpdateFleetData();
+                };
+                formCreazioneFlotta.Show();
+            }
+        }       
 
         private void button2_Click(object sender, EventArgs e)
         {
             // Aggiorno la flotta selezionata sul db
             int row = tabellaFlotte.CurrentRow.Index;
             var flottaTableSelezionata = flotte[row];
-            var fleetApi = ListaFlotte.Single(x => x.IdFlotta == flottaTableSelezionata.Id);
 
-            var flottaBlSelezionata = FlottaBl.FlottaBlFactory(fleetApi.IdFlotta, fleetApi.Nome, "Attivo", new List<AereoBl>());
+            // Recupero la flotta bl selezionata
+            var flottaBlSelezionata = _elencoFlotte.Single(x => x.IdFlotta == flottaTableSelezionata.Id);        
 
             // Mando l'evento
             this.FleetSelected(flottaBlSelezionata);
         }
 
-        public void RequestUpdateData()
-        {
-            InitalizeAereiDataGridFromDBModel();
-        }
-
         private void button3_Click(object sender, EventArgs e)
         {
-            AggiornaDataGridView();
+            RetrieveAndUpdateFleetData();
         }
 
-        private List<FlottaApi> CreazioneListaFlotte()
+        // Chiamata da altra form per refresh dati
+        public void RequestUpdateData()
         {
+            RetrieveAndUpdateFleetData();
+        }
 
-            var client = new HttpClient();
-            client.BaseAddress = new Uri("http://localhost:5093/");
-            Client clientImpianto = new(client);
-            var t = clientImpianto.GetElencoFlotteAsync();
-            t.Wait();
+        // Recupero l'elenco delle flotte dal server
+        private List<FlottaBl> RetrieveFleetData()
+        {
+            // Recupero la flotta
+            var result = _externalService.GetElencoFlotteAsync();
 
-            var a = t.Result;
+            // Converto la risposta nei modelli Bl
+            var flotteBl = _conversionService.ConvertToBl(result);
 
-
-            return a.ToList();
+            return flotteBl;
         }
 
         private void InitalizeAereiDataGridFromDBModel()
         {
             flotte = new BindingList<FlottaTableModel>();
 
-            foreach (var f in ListaFlotte)
+            foreach (var f in _elencoFlotte)
             {
                 var temp = FlottaTableModel.FlottaTableModelFactory(f.IdFlotta, f.Nome, f.Aerei.Count, "Attiva");
                 flotte.Add(temp);
@@ -87,27 +122,8 @@ namespace FlightSimulatorControlCenter
             tabellaFlotte.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            string nameFlotta = textboxnameflotte.Text;
-            var request = new CreateFlottaRequest();
-            request.Nome = nameFlotta;
-
-
-            var client = new HttpClient();
-            client.BaseAddress = new Uri("http://localhost:5093/");
-            Client clientImpianto = new(client);
-            var t = clientImpianto.FlottaPOSTAsync(request);
-            t.Wait();
-
-            var a = t.Result;
-
-            AggiornaDataGridView();
-        }
-
-        private void AggiornaDataGridView()
-        {
-            ListaFlotte = CreazioneListaFlotte();
+        private void RetrieveAndUpdateFleetData() {
+            _elencoFlotte = RetrieveFleetData();
             InitalizeAereiDataGridFromDBModel();
         }
     }

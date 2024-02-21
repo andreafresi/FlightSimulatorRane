@@ -1,4 +1,5 @@
-using ClientFlightSimula;
+using Clients.ImpiantiClient;
+using FlightSimulatorControlCenter.Helper;
 using FlightSimulatorControlCenter.Model.Aereo;
 using FlightSimulatorControlCenter.Model.DB;
 using FlightSimulatorControlCenter.Model.Event;
@@ -16,87 +17,179 @@ namespace FlightSimulatorControlCenter
         public event AirplaneUpdatedEvent AirPlaneUpdated;
         public event AirplaneDeletedEvent AirPlaneDeleted;
 
-        private long IdFlottaAttiva;
-        private FlottaApi flottalocale{ get; set; }
+        private IValidationUserInputService _validationService;
+        private IExternalServicesService _externalService;
+        private IConversionModelService _conversionService;
 
-        private IValidationUserInputService _validationService;       
+        //Stato inizializzazione mancante
+        private long idFlottaAttiva = -1;
+        private FlottaBl flottaAttiva;
 
-        public AirplaneManager(IValidationUserInputService validationService)
+        private CreazioneAereo creazioneAereoForm;
+        private ModificaAereo modificaAereoForm;
+
+        public AirplaneManager(long idFLottaAttiva, IValidationUserInputService validationService, IExternalServicesService externalService, IConversionModelService conversionService)
         {
             InitializeComponent();
             _validationService = validationService;
+            _externalService = externalService;
+            _conversionService = conversionService;
+
+            idFlottaAttiva = idFLottaAttiva;
         }
 
         private void Step1Init_Load(object sender, EventArgs e)
         {
-            // Def data source
-            InitalizeAereiDataGridFromDBModel();
-            UpdateLabelOfSelectedFleet();           
-        }       
+            RetrieveAndUpdateFleetData();
+            CheckUIElementToEnableDisable();
+        }
 
         private void creaAereo_Click(object sender, EventArgs e)
         {
-            // Recupero campi form
-            var formCodice = this.textBox1.Text;
-            var formColore = this.textBox2.Text;
-            var formNumeroDiPosti = this.textBox3.Text;
-
-            // Valido l'input
-            var esistoValidazione = _validationService.ValidateUserInputForAirplaneCreation(formCodice, formColore, formNumeroDiPosti);
-
-            if (esistoValidazione.IsValid())
+            // Apro la form di creazione
+            if (!FormUtils.FormIsOpen("CreazioneAereo"))
             {
-                // X Ragazzi, perchè non mi faccio ritornare direttamente il modello dell'aereo dall'esito validazione
-                // Salvo in locale
-                var a1 = AereoBl.AereoBlCreateFactory(esistoValidazione.Codice, esistoValidazione.Colore, esistoValidazione.NumeroDiPosti);
-                FakeDB.FlottaSelezionata.Aerei.Add(a1);
-
-                // Mando l'evento
-                this.AirPlaneCreated(a1);
-
-                //??
-                InitalizeAereiDataGridFromDBModel();
-
-                // Qui faro la mia chiamata in remoto
-            }
-            else {
-                var messaggeToshow = new StringBuilder();
-                messaggeToshow.Append("Prima di procedere correggere i seguenti errori:\n\r");
-
-                foreach (var message in esistoValidazione.ValidationErrors)
+                creazioneAereoForm = new CreazioneAereo(_validationService);
+                creazioneAereoForm.AirplaneCreateReq += (string codice, string colore, long numPosti) =>
                 {
-                    messaggeToshow.Append(message + "\n\r");
-                }
+                    // Creo la request
+                    var req = new CreateAereoRequest();
+                    req.IdFLotta = flottaAttiva.IdFlotta;
+                    req.CodiceAereo = codice;
+                    req.Colore = colore;
+                    req.NumeroDiPosti = numPosti;
 
-                messaggeToshow.Append("Grazie!\n\r");
+                    // Eseguo la chiamata
+                    var aereoApi = _externalService.AereoPOSTAsync(req);
 
-                MessageBox.Show(messaggeToshow.ToString());
+                    // converto il modello 
+                    var aereoBlCreato = _conversionService.ConvertToBl(aereoApi);
+
+                    // Mando l'evento
+                    this.AirPlaneCreated(aereoBlCreato);
+
+                    // Chiudo la form
+                    creazioneAereoForm.Close();
+
+                    // Richiedo l'aggiornamento della tabella
+                    RetrieveAndUpdateFleetData();
+                };
+                creazioneAereoForm.Show();
             }
         }
-//Aaaaaaaaaa
-        public void RequestUpdateData(long idflottaattiva) {
-            //flotta
-            flottalocale = CreazioneListaAerei(idflottaattiva);
-            //datagrid
-            InitalizeAereiDataGridFromDBModel(flottalocale);
-            //aggiorno label
-            UpdateLabelOfSelectedFleet();
+
+        private void modificaAereo_Click(object sender, EventArgs e)
+        {
+            // Apro la form di creazione
+            if (!FormUtils.FormIsOpen("ModificaAereo"))
+            {
+                // Recupero l'aereo selezionato
+                int row = tabellaAerei.CurrentRow.Index;
+                var flottaTableSelezionata = flottaAttiva.Aerei[row];
+
+                // Recupero la flotta bl selezionata
+                //var flottaBlSelezionata = _elencoFlotte.Single(x => x.IdFlotta == flottaTableSelezionata.Id);
+
+                modificaAereoForm = new ModificaAereo(idFlottaAttiva, flottaTableSelezionata);
+                modificaAereoForm.AirplaneModifyReq += (long idFlotta, long idAereo, string codice, string colore, long numPosti) =>
+                {
+                    // Creo la request
+                    var req = new UpdateAereoRequest();
+                    req.IdAereo = idAereo;
+                    req.CodiceAereo = codice;
+                    req.Colore = colore;
+                    req.NumeroDiPosti = numPosti;
+
+                    // Eseguo la chiamata
+                    var aereoApi = _externalService.AereoPutAsync(req);
+
+                    // converto il modello 
+                    var aereoBlCreato = _conversionService.ConvertToBl(aereoApi);
+
+                    // Mando l'evento
+                    this.AirPlaneUpdated(aereoBlCreato);
+
+                    // Chiudo la form
+                    modificaAereoForm.Close();
+
+                    // Richiedo l'aggiornamento della tabella
+                    RetrieveAndUpdateFleetData();
+                };
+                modificaAereoForm.Show();
+            }
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-          
+            RetrieveAndUpdateFleetData();
         }
 
-        private void InitalizeAereiDataGridFromDBModel(FlottaApi flottalocale)
+        public void RequestUpdateData()
+        {
+            RetrieveAndUpdateFleetData();
+        }
+
+        public void UpdateSelectedFleet(FlottaBl flotta)
+        {
+            idFlottaAttiva = flotta.IdFlotta;
+            CheckUIElementToEnableDisable();
+            RetrieveAndUpdateFleetData();
+        }
+
+        // Controllo se e' selezionata una flotta e attivo disattivo i controlli
+        private void CheckUIElementToEnableDisable()
+        {
+            if (idFlottaAttiva != -1)
+            {
+                this.creaAereo.Enabled = true;
+                this.aggiornaDati.Enabled = true;
+                this.modificaAereo.Enabled = true;
+                this.cancellaAereo.Enabled = true;
+            }
+            else
+            {
+                this.creaAereo.Enabled = false;
+                this.aggiornaDati.Enabled = false;
+                this.modificaAereo.Enabled = false;
+                this.cancellaAereo.Enabled = false;
+            }
+        }
+
+        private void RetrieveAndUpdateFleetData()
+        {
+            if (idFlottaAttiva != -1)
+            {
+                flottaAttiva = RetrieveFleetData();
+                InitalizeAereiDataGridFromDBModel();
+                UpdateLabelOfSelectedFleet();
+            }
+            else
+            {
+                MessageBox.Show("Seleziona una flotta prima di gestire gli aerei!");
+            }
+        }
+
+        // Recupero l'elenco delle flotte dal server
+        private FlottaBl RetrieveFleetData()
+        {
+            // Recupero la flotta
+            var result = _externalService.GetFlottaAsync(idFlottaAttiva);
+
+            // Converto la risposta nei modelli Bl
+            var flotteBl = _conversionService.ConvertToBl(result);
+
+            return flotteBl;
+        }
+
+        private void InitalizeAereiDataGridFromDBModel()
         {
             var result = new BindingList<AereoBl>();
-            
-            foreach (var a in flottalocale.Aerei)
+
+            foreach (var a in flottaAttiva.Aerei)
             {
-                result.Add(AereoBl.AereoBlFactory(a.IdAereo,a.CodiceAereo,a.Colore,a.NumeroDiPosti));
+                result.Add(a);
             }
-    
+
             var source = new BindingSource(result, null);
 
             // Binding data source
@@ -122,21 +215,7 @@ namespace FlightSimulatorControlCenter
 
         private void UpdateLabelOfSelectedFleet()
         {
-            label5.Text = FakeDB.FlottaSelezionata.Nome;
-        }
-
-        private FlottaApi CreazioneListaAerei(long flottaid)
-        {
-
-            var client = new HttpClient();
-            client.BaseAddress = new Uri("http://localhost:5093/");
-            Client clientImpianto = new(client);
-            var t = clientImpianto.FlottaGETAsync(flottaid);
-            t.Wait();
-
-            var a = t.Result;
-
-            return a;
-        }
+            label5.Text = flottaAttiva.Nome;
+        }       
     }
 }
