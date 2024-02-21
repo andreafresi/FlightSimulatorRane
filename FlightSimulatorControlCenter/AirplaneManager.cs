@@ -21,15 +21,13 @@ namespace FlightSimulatorControlCenter
         private IExternalServicesService _externalService;
         private IConversionModelService _conversionService;
 
-        private BindingList<AereoBl> result = new BindingList<AereoBl>();
-
         //Stato inizializzazione mancante
         private long idFlottaAttiva = -1;
         private FlottaBl flottaAttiva;
 
         private CreazioneAereo creazioneAereoForm;
         private ModificaAereo modificaAereoForm;
-        private CancellaManager cancellaManager;
+        private CancellaAereo cancellaAereoForm;       
 
         public AirplaneManager(long idFLottaAttiva, IValidationUserInputService validationService, IExternalServicesService externalService, IConversionModelService conversionService)
         {
@@ -76,6 +74,7 @@ namespace FlightSimulatorControlCenter
 
                     // Richiedo l'aggiornamento della tabella
                     RetrieveAndUpdateFleetData();
+                    CheckUIElementToEnableDisable();
                 };
                 creazioneAereoForm.Show();
             }
@@ -89,9 +88,6 @@ namespace FlightSimulatorControlCenter
                 // Recupero l'aereo selezionato
                 int row = tabellaAerei.CurrentRow.Index;
                 var flottaTableSelezionata = flottaAttiva.Aerei[row];
-
-                // Recupero la flotta bl selezionata
-                //var flottaBlSelezionata = _elencoFlotte.Single(x => x.IdFlotta == flottaTableSelezionata.Id);
 
                 modificaAereoForm = new ModificaAereo(idFlottaAttiva, flottaTableSelezionata);
                 modificaAereoForm.AirplaneModifyReq += (long idFlotta, long idAereo, string codice, string colore, long numPosti) =>
@@ -122,6 +118,38 @@ namespace FlightSimulatorControlCenter
             }
         }
 
+        private void cancellaAereo_Click(object sender, EventArgs e)
+        {           
+            // Apro la form di creazione
+            if (!FormUtils.FormIsOpen("CancellaAereo"))
+            {
+                // Recupero l'aereo selezionato
+                int row = tabellaAerei.CurrentRow.Index;
+                var flottaTableSelezionata = flottaAttiva.Aerei[row];
+
+                cancellaAereoForm = new CancellaAereo(idFlottaAttiva, flottaTableSelezionata);
+                cancellaAereoForm.AirplaneDeleteReq += (long idFlotta, long idAereo) =>
+                {
+                    // Eseguo la chiamata
+                    var aereoApi = _externalService.AereoDeleteAsync(idAereo);
+
+                    // converto il modello 
+                    var aereoBlCreato = _conversionService.ConvertToBl(aereoApi);
+
+                    // Mando l'evento
+                    this.AirPlaneDeleted(aereoBlCreato);
+
+                    // Chiudo la form
+                    cancellaAereoForm.Close();
+
+                    // Richiedo l'aggiornamento della tabella
+                    RetrieveAndUpdateFleetData();
+                    CheckUIElementToEnableDisable();
+                };
+                cancellaAereoForm.Show();
+            }
+        }
+
         private void button2_Click(object sender, EventArgs e)
         {
             RetrieveAndUpdateFleetData();
@@ -142,13 +170,13 @@ namespace FlightSimulatorControlCenter
         // Controllo se e' selezionata una flotta e attivo disattivo i controlli
         private void CheckUIElementToEnableDisable()
         {
-            if (idFlottaAttiva != -1)
+            if (idFlottaAttiva != -1 && flottaAttiva != null)
             {
                 this.creaAereo.Enabled = true;
-                this.aggiornaDati.Enabled = true;
-                this.modificaAereo.Enabled = true;
-                this.cancellaAereo.Enabled = true;
-            }
+                this.aggiornaDati.Enabled = flottaAttiva.Aerei.Any();
+                this.modificaAereo.Enabled = flottaAttiva.Aerei.Any();
+                this.cancellaAereo.Enabled = flottaAttiva.Aerei.Any();
+            }           
             else
             {
                 this.creaAereo.Enabled = false;
@@ -186,7 +214,7 @@ namespace FlightSimulatorControlCenter
 
         private void InitalizeAereiDataGridFromDBModel()
         {
-             result = new BindingList<AereoBl>();
+            var result = new BindingList<AereoBl>();
 
             foreach (var a in flottaAttiva.Aerei)
             {
@@ -219,15 +247,6 @@ namespace FlightSimulatorControlCenter
         private void UpdateLabelOfSelectedFleet()
         {
             label5.Text = flottaAttiva.Nome;
-        }
-
-        private void cancellaAereo_Click(object sender, EventArgs e)
-        {
-            int row = tabellaAerei.CurrentRow.Index;
-            var aereiTableSelezionata = result[row];
-
-            cancellaManager = new CancellaManager(aereiTableSelezionata);
-            cancellaManager.Show();
-        }
+        }       
     }
 }

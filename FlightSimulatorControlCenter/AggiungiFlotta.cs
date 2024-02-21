@@ -27,7 +27,7 @@ namespace FlightSimulatorControlCenter
             this.FleetCreateReq(nomeFlotta);
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void annullaButton_Click(object sender, EventArgs e)
         {
             this.Close();
         }
