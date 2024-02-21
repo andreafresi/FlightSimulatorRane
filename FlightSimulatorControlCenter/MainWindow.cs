@@ -1,7 +1,9 @@
 ﻿using FlightSimulatorControlCenter.Helper;
 using FlightSimulatorControlCenter.Model.Aereo;
+using FlightSimulatorControlCenter.Model.Event;
 using FlightSimulatorControlCenter.Model.Flotta;
 using FlightSimulatorControlCenter.Service.Int;
+using System.Net;
 
 namespace FlightSimulatorControlCenter
 {
@@ -11,10 +13,14 @@ namespace FlightSimulatorControlCenter
         private IExternalServicesService _externalService;
         private IConversionModelService _conversionService;
         private ToolStripLabel LabelFlottaSelezionata;
+        public event UpdateService UpdateService;
+
 
         // Aggiungo la ref alle due form
         AirplaneManager airplaneManagerForm;
         FleetManager fleetManagerForm;
+        ServiceManager ServiceManager;
+        
 
         long idFlottaSelezionata = -1;
 
@@ -76,6 +82,19 @@ namespace FlightSimulatorControlCenter
                 fleetManagerForm.Show();
             }
         }
+
+        private void ServiceManagerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!FormUtils.FormIsOpen("ServiceManager"))
+            {
+                ServiceManager = new ServiceManager();
+                ServiceManager.MdiParent = this;
+                ServiceManager.FormPrincipale = this;
+                HandleServiceManager(ServiceManager);
+                ServiceManager.Show();
+            }
+        }
+
 
         private void HandleFleetManagerEvent(FleetManager fleetManager)
         {
