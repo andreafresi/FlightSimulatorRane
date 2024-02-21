@@ -73,7 +73,7 @@ namespace FlightSimulatorControlCenter
                 MessageBox.Show(messaggeToshow.ToString());
             }
         }
-
+//Aaaaaaaaaa
         public void RequestUpdateData(long idflottaattiva) {
             //flotta
             flottalocale = CreazioneListaAerei(idflottaattiva);
