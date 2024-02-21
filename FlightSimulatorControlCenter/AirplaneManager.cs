@@ -39,6 +39,12 @@ namespace FlightSimulatorControlCenter
             idFlottaAttiva = idFLottaAttiva;
         }
 
+        public void UpdateService(IExternalServicesService externalService)
+        {
+            _externalService = externalService;
+            RetrieveAndUpdateFleetData(); // aggiorna le flotte
+        }
+
         private void Step1Init_Load(object sender, EventArgs e)
         {
             RetrieveAndUpdateFleetData();
@@ -128,7 +134,7 @@ namespace FlightSimulatorControlCenter
                 var flottaTableSelezionata = flottaAttiva.Aerei[row];
 
                 cancellaAereoForm = new CancellaAereo(idFlottaAttiva, flottaTableSelezionata);
-                cancellaAereoForm.AirplaneDeleteReq += ( idFlotta, long idAereo) =>
+                cancellaAereoForm.AirplaneDeleteReq += ( idFlotta, idAereo) =>
                 {
                     // Eseguo la chiamata
                     var aereoApi = _externalService.AereoDeleteAsync(idAereo);

@@ -20,7 +20,7 @@ namespace FlightSimulatorControlCenter
         AirplaneManager airplaneManagerForm;
         FleetManager fleetManagerForm;
         ServiceManager ServiceManager;
-        
+
 
         long idFlottaSelezionata = -1;
 
@@ -41,7 +41,7 @@ namespace FlightSimulatorControlCenter
             {
                 airplaneManagerForm = new AirplaneManager(idFlottaSelezionata, _validationService, _externalService, _conversionService);
                 airplaneManagerForm.MdiParent = this;
-                HandleAirplaneManagerEvent(airplaneManagerForm);              
+                HandleAirplaneManagerEvent(airplaneManagerForm);
 
                 airplaneManagerForm.Show();
             }
@@ -70,7 +70,7 @@ namespace FlightSimulatorControlCenter
                 fleetManagerForm?.RequestUpdateData();
             };
         }
-        
+
         private void fleetManagerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (!FormUtils.FormIsOpen("FleetManager"))
@@ -80,18 +80,6 @@ namespace FlightSimulatorControlCenter
                 fleetManagerForm.FormPrincipale = this;
                 HandleFleetManagerEvent(fleetManagerForm);
                 fleetManagerForm.Show();
-            }
-        }
-
-        private void ServiceManagerToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (!FormUtils.FormIsOpen("ServiceManager"))
-            {
-                ServiceManager = new ServiceManager();
-                ServiceManager.MdiParent = this;
-                ServiceManager.FormPrincipale = this;
-                HandleServiceManager(ServiceManager);
-                ServiceManager.Show();
             }
         }
 
@@ -117,24 +105,44 @@ namespace FlightSimulatorControlCenter
                 idFlottaSelezionata = flotta.IdFlotta;
                 UpdateLabelOfSelectedFleet(flotta.Nome);
 
-                airplaneManagerForm?.UpdateSelectedFleet(flotta);                
+                airplaneManagerForm?.UpdateSelectedFleet(flotta);
             };
         }
 
         // Metodi interni
-        private void UpdateLabelOfSelectedFleet(string labelFlotta) {
+        private void UpdateLabelOfSelectedFleet(string labelFlotta)
+        {
             // Aggiorno la label nella schermata principale
 
             // Rimuovo la label corrente se presente
-            if (LabelFlottaSelezionata != null) {
+            if (LabelFlottaSelezionata != null)
+            {
                 menuStrip1.Items.Remove(LabelFlottaSelezionata);
-            }        
+            }
 
             // Creo la nuova label e la aggiungo
             LabelFlottaSelezionata = new ToolStripLabel(labelFlotta);
             LabelFlottaSelezionata.Alignment = ToolStripItemAlignment.Right;
             LabelFlottaSelezionata.Padding = new Padding(0, 0, 20, 0);
             menuStrip1.Items.Add(LabelFlottaSelezionata);
+        }
+
+        private void serviceManagerToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (!FormUtils.FormIsOpen("ServiceManager"))
+            {
+                ServiceManager = new ServiceManager();
+                ServiceManager.updateService += (IExternalServicesService Service) =>
+                {
+                    _externalService = Service;
+                    idFlottaSelezionata = -1;
+                    fleetManagerForm?.UpdateService(_externalService);
+                    airplaneManagerForm?.UpdateService(_externalService);
+                    ServiceManager.Close();
+                };
+                ServiceManager.Show();
+            }
+            
         }
     }
 }
